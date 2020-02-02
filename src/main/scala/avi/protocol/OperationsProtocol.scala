@@ -5,6 +5,9 @@ import avi.domain.violations.Violation
 import spray.json._
 
 object OperationsProtocol extends DefaultJsonProtocol {
+
+
+
   implicit object accountProtocol extends RootJsonFormat[Account] {
     override def read(json: JsValue): Account = {
       json.asJsObject.getFields("active-card", "available-limit") match {
@@ -41,6 +44,27 @@ object OperationsProtocol extends DefaultJsonProtocol {
     override def write(obj: Operation): JsValue = obj match {
       case i:InitOperation => i.toJson
       case t:TransactionOperation =>t.toJson
+    }
+  }
+
+  implicit object InitOperationResponseProtocol extends RootJsonWriter[InitOperationResponse] {
+    override def write(obj: InitOperationResponse): JsValue = JsObject(
+      "account" -> obj.account.toJson,
+      "violations" -> JsArray(obj.violations.toVector.map(_.toJson))
+    )
+  }
+
+  implicit object TransactionResponseProtocol extends RootJsonWriter[TransactionResponse] {
+    override def write(obj: TransactionResponse): JsValue = JsObject(
+      "transaction" -> obj.transaction.toJson,
+      "violations" -> JsArray(obj.violations.toVector.map(_.toJson))
+    )
+  }
+
+  implicit object operationResponseFormat extends RootJsonWriter[OperationResponse] {
+    override def write(obj: OperationResponse): JsValue = obj match {
+      case i:InitOperationResponse => i.toJson
+      case t:TransactionResponse =>t.toJson
     }
   }
 }
