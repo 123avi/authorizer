@@ -32,3 +32,4 @@ scripts/ssl/*.crt
 scripts/ssl/*.csr
 scripts/ssl/*.key
 *.sc
+/sbt-dist/
