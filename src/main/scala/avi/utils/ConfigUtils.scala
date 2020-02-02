@@ -26,6 +26,4 @@ trait ConfigUtils {
   def getMinutes(key: String, default: => Long): FiniteDuration = {
     getDuration(key, default)(scala.concurrent.duration.MINUTES)
   }
-
-
 }

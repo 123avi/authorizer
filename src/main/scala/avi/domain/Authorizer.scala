@@ -1,9 +1,9 @@
 package avi.domain
-import scala.language.postfixOps
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import avi.domain.Operations._
 import avi.domain.violations.Violation._
-import avi.utils.ConfigUtils
+
+import scala.language.postfixOps
 
 object Authorizer{
   def props( replyTo: ActorRef) = Props(new Authorizer(replyTo))
@@ -11,13 +11,13 @@ object Authorizer{
 
 }
 
-class Authorizer( replyTo: ActorRef) extends Actor with ActorLogging with ConfigUtils{
+class Authorizer( replyTo: ActorRef) extends Actor with ActorLogging {
   import Authorizer._
+  import avi.utils.AuthorizerConfig._
   import avi.utils.DateTimeConversions._
   import context.dispatcher
 
-  val maxTransaction  = getInt("max-transactions", 3)
-  val transactionInterval = getMinutes("transactions-interval-minutes", 2)
+  log.info(s"Starting authorizer with max-transactions of $maxTransaction and interval of $transactionInterval minutes")
 
   case class ExecuteTransaction(t: Transaction)
 
@@ -29,12 +29,10 @@ class Authorizer( replyTo: ActorRef) extends Actor with ActorLogging with Config
     case i:InitOperation if i.account.activeCard=>
       replyTo ! InitOperationResponse(i.account, Set())
       fireTimer()
-      log.debug(s"Set to run with limit ${i.account.availableLimit}")
       context.become(run(i.account.availableLimit, Set()).orElse(defaultViolation("waitForInit -> run")))
 
     case i:InitOperation =>
       replyTo ! InitOperationResponse(i.account, Set())
-      log.debug(s"Set to INACTIVE")
       context.become(inactiveAccount().orElse(defaultViolation("inactive")))
 
     case transactionOp: TransactionOperation =>
@@ -53,8 +51,6 @@ class Authorizer( replyTo: ActorRef) extends Actor with ActorLogging with Config
       replyTo ! TransactionResponse(t, Set(InsufficientLimit))
 
     case TransactionOperation(t)  =>
-//            val availableLimit = limit - t.amount
-//            replyTo ! TransactionResponse(t.copy(amount = availableLimit), Set ())
       context.become(run(limit, transactions + t).orElse(defaultViolation("run-TransactionOperation")))
 
     case CompleteAggregate =>
