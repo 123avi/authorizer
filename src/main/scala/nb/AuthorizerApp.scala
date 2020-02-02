@@ -1,10 +1,10 @@
-package avi
+package nb
 
 import akka.actor.ActorSystem
 import akka.pattern.gracefulStop
 import akka.util.Timeout
-import avi.domain.Authorizer
-import avi.domain.Operations.Operation
+import nb.domain.Authorizer
+import nb.domain.Operations.Operation
 import spray.json._
 
 import scala.concurrent.Await

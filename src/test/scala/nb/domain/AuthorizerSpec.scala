@@ -1,17 +1,17 @@
-package avi.domain
+package nb.domain
 
 import akka.testkit.TestProbe
-import avi.domain.Operations._
-import avi.domain.violations.Violation
-import avi.helper.TestHelper
+import nb.domain.Operations._
+import nb.domain.violations.Violation
+import nb.helper.TestHelper
 
 class AuthorizerSpec extends TestHelper {
   val activeAccount = Account(true, 500)
   val inactiveAccount = Account(false, 500)
-  val transaction1 = Transaction("avi", 50, "2019-02-13T10:00:00.000Z")
-  val transaction2 = Transaction("avi", 50, "2019-02-13T10:01:00.000Z")
-  val transaction3 = Transaction("avi", 50, "2019-02-13T10:02:00.000Z")
-  val transaction4 = Transaction("avi", 50, "2019-02-13T10:01:30.000Z")
+  val transaction1 = Transaction("nb", 50, "2019-02-13T10:00:00.000Z")
+  val transaction2 = Transaction("nb", 50, "2019-02-13T10:01:00.000Z")
+  val transaction3 = Transaction("nb", 50, "2019-02-13T10:02:00.000Z")
+  val transaction4 = Transaction("nb", 50, "2019-02-13T10:01:30.000Z")
 
   val probe = TestProbe()
 

@@ -1,7 +1,4 @@
-package avi.utils
-
-import java.text.SimpleDateFormat
-import java.util.Date
+package nb.utils
 
 import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}

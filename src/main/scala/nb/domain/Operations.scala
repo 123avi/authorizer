@@ -1,6 +1,6 @@
-package avi.domain
+package nb.domain
 
-import avi.domain.violations.Violation
+import nb.domain.violations.Violation
 
 object Operations {
   sealed trait Operation

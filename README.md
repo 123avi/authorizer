@@ -1,6 +1,9 @@
 # Authorizer
 The Authorizer application authorizes a transaction for a specific account following a set of predefined rules.
 
+The application aggregates all transaction in 2 minutes interval, once the aggregation interval completes the transactions
+will be executed according to the time defined in transaction
+
 ## The application:
 Appication is written in Scala and based on Akka actors.
 

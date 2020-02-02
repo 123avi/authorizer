@@ -1,7 +1,7 @@
-package avi.protocol
+package nb.protocol
 
-import avi.domain.Operations._
-import avi.domain.violations.Violation
+import nb.domain.Operations._
+import nb.domain.violations.Violation
 import spray.json._
 
 object OperationsProtocol extends DefaultJsonProtocol {

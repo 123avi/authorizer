@@ -1,4 +1,4 @@
-package avi.domain.violations
+package nb.domain.violations
 
 sealed abstract class Violation(val asString: String)
 

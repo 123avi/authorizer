@@ -1,7 +1,7 @@
-package avi.domain
+package nb.domain
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import avi.domain.Operations._
-import avi.domain.violations.Violation._
+import nb.domain.Operations._
+import nb.domain.violations.Violation._
 
 import scala.language.postfixOps
 
@@ -13,9 +13,9 @@ object Authorizer{
 
 class Authorizer( replyTo: ActorRef) extends Actor with ActorLogging {
   import Authorizer._
-  import avi.utils.AuthorizerConfig._
-  import avi.utils.DateTimeConversions._
   import context.dispatcher
+  import nb.utils.AuthorizerConfig._
+  import nb.utils.DateTimeConversions._
 
   log.info(s"Starting authorizer with max-transactions of $maxTransaction and interval of $transactionInterval minutes")
 

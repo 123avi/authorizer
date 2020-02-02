@@ -1,4 +1,4 @@
-package avi.utils
+package nb.utils
 
 import com.typesafe.config.ConfigFactory
 
