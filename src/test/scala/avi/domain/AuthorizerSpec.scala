@@ -1,8 +1,7 @@
 package avi.domain
 
-import akka.actor.ActorSystem
 import akka.testkit.TestProbe
-import avi.domain.Operations.{Account, InitOperation, InitOperationResponse, Transaction, TransactionOperation, TransactionResponse}
+import avi.domain.Operations._
 import avi.domain.violations.Violation
 import avi.helper.TestHelper
 
@@ -73,11 +72,8 @@ class AuthorizerSpec extends TestHelper {
       authorizer ! InitOperation(activeAccount)
       probe.expectMsg(InitOperationResponse(activeAccount, Set()))
       authorizer ! TransactionOperation(transaction1)
-//      probe.expectMsg(TransactionResponse(transaction1.copy(amount = 450), Set()))
       authorizer ! TransactionOperation(transaction2)
-//      probe.expectMsg(TransactionResponse(transaction2.copy(amount = 400), Set()))
       authorizer ! TransactionOperation(transaction3)
-//      probe.expectMsg(TransactionResponse(transaction3.copy(amount = 350), Set()))
       authorizer ! TransactionOperation(transaction4)
       probe.expectMsg(TransactionResponse(transaction4, Set(Violation.HighFrequencySmallInterval)))
 
@@ -88,11 +84,8 @@ class AuthorizerSpec extends TestHelper {
       authorizer ! InitOperation(activeAccount)
       probe.expectMsg(InitOperationResponse(activeAccount, Set()))
       authorizer ! TransactionOperation(transaction1)
-//      probe.expectMsg(TransactionResponse(transaction1.copy(amount = 450), Set()))
       authorizer ! TransactionOperation(transaction2)
-//      probe.expectMsg(TransactionResponse(transaction2.copy(amount = 400), Set()))
       authorizer ! TransactionOperation(transaction3)
-//      probe.expectMsg(TransactionResponse(transaction3.copy(amount = 350), Set()))
       authorizer ! TransactionOperation(transaction2)
       probe.expectMsg(TransactionResponse(transaction2, Set(Violation.DoubledTransaction)))
 
