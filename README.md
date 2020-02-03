@@ -5,18 +5,18 @@ The application aggregates all transaction in 2 minutes interval, once the aggre
 will be executed according to the time defined in transaction
 
 ## The application:
-Appication is written in Scala and based on Akka actors.
-
-### Building executable 
-Use *sbt* build tool <https://www.scala-sbt.org/>
-
-run the command: *sbt clean assembly* or *sbt assembly*
+Appication is written in [Scala](https://docs.scala-lang.org/) and based on [Akka actors](https://doc.akka.io/docs/akka/current/actors.html) .
 
 ### running the Application 
  java -jar $PATH_TO_JAR/authorizer-assembly-1.0.jar
 
- **Note**: according to the spec parsing errors will note happen, however I added another command for graceful stop.
- For graceful stop use the command **stop** as input
+For graceful stop use the command **stop** as input or simply *CTL+C*
+
+### Building executable
+Use *sbt* build tool <https://www.scala-sbt.org/>
+
+run the command: *sbt clean assembly* or *sbt assembly*
+
 
 ### Project structure 
 Domain Driven Design is the main design approach hence using a ubiquitous language trough the spec document given by Nubank and 
@@ -43,6 +43,7 @@ package that contains helpers for handling the configuration and datetime conven
 
 The application accepts the input and emits the output as json
 
+#### Publisher - simple actor that simply receives a message and emits it to the stdout as a json
 
 Akka actors are low resource and enables to achieve async and scalable operations easly.
 In case the code will need to support many accounts I would use persistent actors and event sourcing approach. 
