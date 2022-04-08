@@ -4,15 +4,15 @@ import akka.actor.{Actor, ActorLogging, Props}
 import nb.domain.Operations.OperationResponse
 
 object Publisher{
-  def props = Props[Publisher]
+  def props( output: Any => Unit = println) = Props(new Publisher(output))
 }
 
-class Publisher extends Actor with ActorLogging{
+class Publisher( output: Any => Unit) extends Actor with ActorLogging{
   import nb.protocol.OperationsProtocol._
   import spray.json._
 
   override def receive: Receive = {
     case msg:OperationResponse =>
-      println(msg.toJson)
+      output(msg.toJson)
   }
 }

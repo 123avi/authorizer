@@ -18,7 +18,7 @@ object AuthorizerApp extends App{
 
   val system = ActorSystem("AuthorizerApp")
 
-  val publisher = system.actorOf(Publisher.props)
+  val publisher = system.actorOf(Publisher.props())
   val authorizer = system.actorOf(Authorizer.props(publisher))
   run()
 
