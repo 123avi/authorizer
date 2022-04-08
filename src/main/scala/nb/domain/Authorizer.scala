@@ -30,7 +30,6 @@ object Authorizer{
 
 class Authorizer( replyTo: ActorRef) extends Actor with ActorLogging with DateTimeConversions{
   import Authorizer._
-  import context.dispatcher
   import nb.utils.AuthorizerConfig._
 
   log.info(s"Starting authorizer with max-transactions of $maxTransactionFrequency and interval of $transactionInterval seconds")

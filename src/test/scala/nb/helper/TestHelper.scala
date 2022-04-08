@@ -12,9 +12,6 @@ abstract class TestHelper extends TestKit(ActorSystem("AuthorizerSpecSystem"))
   with Matchers
   with BeforeAndAfterAll {
 
-//  implicit val system = ActorSystem("AothorizerSpec")
-
-
   override def afterAll: Unit = {
     TestKit.shutdownActorSystem(system)
   }

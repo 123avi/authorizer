@@ -14,7 +14,7 @@ object AuthorizerApp extends App{
   import protocol.OperationsProtocol._
 
   import scala.concurrent.duration._
-  implicit val timeout = Timeout(5 seconds) // needed for `?` below
+  implicit val timeout = Timeout(5 seconds)
 
   val system = ActorSystem("AuthorizerApp")
 

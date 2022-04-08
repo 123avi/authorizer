@@ -1,4 +1,4 @@
-# Authorizer
+# Authorizer App
 The Authorizer application authorizes a transaction for a specific account following a set of predefined rules.
 
 The application aggregates all transactions within 2 minutes interval, once the aggregation interval completes, the transactions
@@ -25,26 +25,33 @@ naming the application entities
 #### Tests
 All rules defined in the spec are covered in *AthorizerSpec.scala*
 
-#### Packages :
-##### domain 
-1. violations - a package contains  the value objects that represents the different violations
-2. Authorizer - Aggregate represents the Account life cicle states) and executes the operations according to the logic
-Authorizer states :
+### domain entities:
+ 
+#### Authorizer 
+ Aggregate the Account life states, and simulates state machine of the account life cycle  and executes the operations according to the logic
+
+**Authorizer states** :
 * *waitForInit* - the initial state, waits for Init account command , once the account is initilize with active-card true it fires 
 timer accourding to transaction interval (2 minutes,can be configured) and change the state to run or to inactiveAccount 
 (depends on the active-card argument)
 * *run* - accepts transactions and checks validation of the operation
-* *inactiveAccount* - incase the active-card:false, this state will response with violation "card-not-active" in case of transaction
-##### protocol
+* *inactiveAccount* - in case the active-card:false, this state will respond with violation "card-not-active" in case of transaction
+
+#### violations
+contains the value objects that represents the different violations
+#### Operations
+contains the value objects that represents the different operations and responses
+
+### protocol
 This package contains the json conventions protocol
+The application accepts the input and emits the output as json
 
 #### utils 
 package that contains helpers for handling the configuration and datetime conventions gracefully
 
-The application accepts the input and emits the output as json
-
 #### Publisher - simple actor that simply receives a message and emits it to the stdout as a json
 
-Akka actors are low resource and enables to achieve async and scalable operations easly.
-In case the code will need to support many accounts I would use persistent actors and event sourcing approach. 
-I didn't use it in this case because the application should use only the memory as a storage.
+## Remarks
+* Akka actors are low resource and enables to achieve async and scalable operations easily.
+* Each actor is minimized to maintain single responsibility althogh it might be a little overhead or over engineering I do believe that it is correct in a real life apps.   
+* In order to keep it simple I didn't use persisted actor or other persistence storage and maintained a single account with in memory state as requested.
