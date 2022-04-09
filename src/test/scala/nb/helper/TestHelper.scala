@@ -15,4 +15,5 @@ abstract class TestHelper extends TestKit(ActorSystem("AuthorizerSpecSystem"))
   override def afterAll: Unit = {
     TestKit.shutdownActorSystem(system)
   }
+
 }

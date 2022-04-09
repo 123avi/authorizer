@@ -33,8 +33,6 @@ class AuthorizerSpec extends TestHelper {
       val transaction5 = Transaction("f", 40, "2019-02-13T11:02:20.000Z")
       val transactions = Set(transaction1, transaction2, transaction3, transaction4, transaction5)
 
-
-      val interval = AuthorizerConfig.transactionInterval
       Authorizer.takeLast(transactions, AuthorizerConfig.transactionInterval) should contain theSameElementsAs
         List(transaction5, transaction4, transaction3, transaction2)
     }
