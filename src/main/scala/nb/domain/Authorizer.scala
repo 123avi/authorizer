@@ -34,8 +34,6 @@ class Authorizer( replyTo: ActorRef) extends Actor with ActorLogging with DateTi
 
   log.info(s"Starting authorizer with max-transactions of $maxTransactionFrequency and interval of $transactionInterval seconds")
 
-  case class ExecuteTransaction(t: Transaction)
-
   override def receive: Receive = waitForInit
 
   def waitForInit : Receive = {

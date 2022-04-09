@@ -37,6 +37,10 @@ class AuthorizerSpec extends TestHelper {
         List(transaction5, transaction4, transaction3, transaction2)
     }
 
+    "Authorizer.takeLast return empty list if no transactions " in {
+      val transactions: Set[Transaction] = Set()
+      Authorizer.takeLast(transactions, AuthorizerConfig.transactionInterval) shouldEqual Nil
+    }
 
 
     "Init an account should response without violations" in {
@@ -71,12 +75,20 @@ class AuthorizerSpec extends TestHelper {
 
     }
 
-    "respond with Card Not Active rule: No transaction should be accepted when the card is not active" in {
-      val probe = TestProbe()
+    "respond with AccountNotInitialized rule: No transaction should be accepted when the account is not initialized" in {
 
+      val probe = TestProbe()
+      val transaction1 = Transaction("Burger King", 50, "2019-02-13T11:00:00.000Z")
+      val authorizer = system.actorOf(Authorizer.props( probe.ref))
+      authorizer ! TransactionOperation(transaction1)
+      probe.expectMsg(TransactionResponse(transaction1, Set(Violation.AccountNotInitialized)))
+    }
+
+    "respond with Card Not Active rule: No transaction should be accepted when the card is not active" in {
+
+      val probe = TestProbe()
       val inactiveAccount = Account(false, 500)
       val transaction1 = Transaction("Burger King", 50, "2019-02-13T11:00:00.000Z")
-
       val authorizer = system.actorOf(Authorizer.props( probe.ref))
       authorizer ! InitOperation(inactiveAccount)
       probe.expectMsg(InitOperationResponse(inactiveAccount, Set()))
