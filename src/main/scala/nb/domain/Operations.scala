@@ -14,5 +14,6 @@ object Operations {
 
   sealed trait OperationResponse{ def violations: Set[Violation] }
   final case class InitOperationResponse(account: Account, violations: Set[Violation]) extends OperationResponse
-  final case class TransactionResponse(transaction: Transaction, violations: Set[Violation]) extends OperationResponse
+  final case class TransactionResponse(account: Option[Account], violations: Set[Violation]) extends OperationResponse
+//  final case class TransactionResponse(transaction: Transaction, violations: Set[Violation]) extends OperationResponse
 }

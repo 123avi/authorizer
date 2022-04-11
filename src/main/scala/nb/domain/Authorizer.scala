@@ -39,38 +39,39 @@ class Authorizer( replyTo: ActorRef) extends Actor with ActorLogging with DateTi
   def waitForInit : Receive = {
     case i:InitOperation if i.account.activeCard=>
       replyTo ! InitOperationResponse(i.account, Set())
-      context.become(run(i.account.availableLimit, Set()).orElse(defaultViolation("waitForInit -> run")))
+      context.become(run(i.account, Set()).orElse(defaultViolation("waitForInit -> run")))
 
     case i:InitOperation =>
       replyTo ! InitOperationResponse(i.account, Set())
-      context.become(inactiveAccount().orElse(defaultViolation("inactive")))
+      context.become(inactiveAccount(i.account).orElse(defaultViolation("inactive")))
 
-    case transactionOp: TransactionOperation =>
-      replyTo ! TransactionResponse(transactionOp.transaction, Set(AccountNotInitialized))
+    case _: TransactionOperation =>
+      replyTo ! TransactionResponse(None, Set(AccountNotInitialized))
   }
 
-  def run(limit: Double, transactions: Set[Transaction]) : Receive = {
+  def run(account: Account, transactions: Set[Transaction]) : Receive = {
 
     case TransactionOperation(t) if transactions.exists(trans => trans.amount == t.amount && trans.merchant == t.merchant
       && isWithinInterval(trans.time, t.time)) =>
-      replyTo ! TransactionResponse(t.copy(amount = limit), Set(DoubledTransaction))
+      replyTo ! TransactionResponse(Some(account), Set(DoubledTransaction))
 
     case TransactionOperation(t)  if takeLast(transactions + t).length > maxTransactionFrequency =>
-      replyTo ! TransactionResponse(t.copy(amount = limit), Set (HighFrequencySmallInterval))
+      replyTo ! TransactionResponse(Some(account), Set (HighFrequencySmallInterval))
 
-    case TransactionOperation(t) if limit < t.amount =>
-      replyTo ! TransactionResponse(t, Set(InsufficientLimit))
+    case TransactionOperation(t) if account.availableLimit < t.amount =>
+      replyTo ! TransactionResponse(Some(account), Set(InsufficientLimit))
 
     case TransactionOperation(t)  =>
-      val newLimit = limit - t.amount
-      context.become(run(newLimit, transactions + t))
-      replyTo ! TransactionResponse(t.copy(amount = newLimit), Set())
+      val newLimit = account.availableLimit - t.amount
+      val acc = account.copy(availableLimit = newLimit)
+      context.become(run(acc, transactions + t))
+      replyTo ! TransactionResponse(Some(acc), Set())
 
   }
 
-  def inactiveAccount(): Receive = {
+  def inactiveAccount(account: Account): Receive = {
     case TransactionOperation(transaction) =>
-      replyTo ! TransactionResponse(transaction, Set(CardNotActive))
+      replyTo ! TransactionResponse(Some(account), Set(CardNotActive))
   }
 
   def defaultViolation(logMsg:String) : Receive = {

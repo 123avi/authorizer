@@ -81,7 +81,7 @@ class AuthorizerSpec extends TestHelper {
       val transaction1 = Transaction("Burger King", 50, "2019-02-13T11:00:00.000Z")
       val authorizer = system.actorOf(Authorizer.props( probe.ref))
       authorizer ! TransactionOperation(transaction1)
-      probe.expectMsg(TransactionResponse(transaction1, Set(Violation.AccountNotInitialized)))
+      probe.expectMsg(TransactionResponse(None, Set(Violation.AccountNotInitialized)))
     }
 
     "respond with Card Not Active rule: No transaction should be accepted when the card is not active" in {
@@ -93,7 +93,7 @@ class AuthorizerSpec extends TestHelper {
       authorizer ! InitOperation(inactiveAccount)
       probe.expectMsg(InitOperationResponse(inactiveAccount, Set()))
       authorizer ! TransactionOperation(transaction1)
-      probe.expectMsg(TransactionResponse(transaction1, Set(Violation.CardNotActive)))
+      probe.expectMsg(TransactionResponse(Some(inactiveAccount), Set(Violation.CardNotActive)))
 
     }
 
@@ -112,9 +112,9 @@ class AuthorizerSpec extends TestHelper {
       authorizer ! TransactionOperation(transaction2)
       authorizer ! TransactionOperation(transaction3)
 
-      probe.expectMsg(TransactionResponse(transaction1, Set(Violation.InsufficientLimit)))
-      probe.expectMsg(TransactionResponse(transaction2, Set(Violation.InsufficientLimit)))
-      probe.expectMsg(TransactionResponse(transaction3.copy(amount = 200), Set()))
+      probe.expectMsg(TransactionResponse(Some(account), Set(Violation.InsufficientLimit)))
+      probe.expectMsg(TransactionResponse(Some(account), Set(Violation.InsufficientLimit)))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 200)), Set()))
 
     }
 
@@ -136,11 +136,11 @@ class AuthorizerSpec extends TestHelper {
       authorizer ! TransactionOperation(transaction3)
       authorizer ! TransactionOperation(transaction4)
       authorizer ! TransactionOperation(transaction5)
-      probe.expectMsg(TransactionResponse(transaction1.copy(amount = 80), Set()))
-      probe.expectMsg(TransactionResponse(transaction2.copy(amount = 60), Set()))
-      probe.expectMsg(TransactionResponse(transaction3.copy(amount = 40), Set()))
-      probe.expectMsg(TransactionResponse(transaction4.copy(amount = 40), Set(Violation.HighFrequencySmallInterval)))
-      probe.expectMsg(TransactionResponse(transaction5.copy(amount = 30), Set()))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 80)), Set()))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 60)), Set()))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 40)), Set()))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 40)), Set(Violation.HighFrequencySmallInterval)))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 30)), Set()))
 
     }
 
@@ -160,30 +160,30 @@ class AuthorizerSpec extends TestHelper {
       authorizer ! TransactionOperation(transaction2)
       authorizer ! TransactionOperation(transaction3)
       authorizer ! TransactionOperation(transaction4)
-      probe.expectMsg(TransactionResponse(transaction1.copy(amount = 80), Set()))
-      probe.expectMsg(TransactionResponse(transaction2.copy(amount = 70), Set()))
-      probe.expectMsg(TransactionResponse(transaction3.copy(amount = 70), Set(Violation.DoubledTransaction)))
-      probe.expectMsg(TransactionResponse(transaction4.copy(amount = 55), Set()))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 80)), Set()))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 70)), Set()))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 70)), Set(Violation.DoubledTransaction)))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 55)), Set()))
 
     }
 
     "response with no violations if there is sufficient limit" in {
       val probe = TestProbe()
 
-      val activeAccount = Account(true, 500)
+      val account = Account(true, 500)
       val transaction1 = Transaction("Burger King", 50, "2019-02-13T11:00:00.000Z")
       val transaction2 = Transaction("Habbib", 50, "2019-02-13T11:00:01.000Z")
       val transaction3 = Transaction("McDonald's", 50, "2019-02-13T11:01:01.000Z")
       val authorizer = system.actorOf(Authorizer.props( probe.ref))
-      authorizer ! InitOperation(activeAccount)
-      probe.expectMsg(InitOperationResponse(activeAccount, Set()))
+      authorizer ! InitOperation(account)
+      probe.expectMsg(InitOperationResponse(account, Set()))
       authorizer ! TransactionOperation(transaction1)
       authorizer ! TransactionOperation(transaction2)
       authorizer ! TransactionOperation(transaction3)
       //      authorizer ! Authorizer.CompleteAggregate
-      probe.expectMsg(TransactionResponse(transaction1.copy(amount = 450), Set()))
-      probe.expectMsg(TransactionResponse(transaction2.copy(amount = 400), Set()))
-      probe.expectMsg(TransactionResponse(transaction3.copy(amount = 350), Set()))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 450)), Set()))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 400)), Set()))
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 350)), Set()))
     }
   }
 

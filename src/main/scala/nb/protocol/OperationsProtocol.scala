@@ -56,7 +56,7 @@ object OperationsProtocol extends DefaultJsonProtocol {
 
   implicit object TransactionResponseProtocol extends RootJsonWriter[TransactionResponse] {
     override def write(obj: TransactionResponse): JsValue = JsObject(
-      "transaction" -> obj.transaction.toJson,
+      "account" -> obj.account.toJson,
       "violations" -> JsArray(obj.violations.toVector.map(_.toJson))
     )
   }

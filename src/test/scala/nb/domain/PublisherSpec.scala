@@ -3,7 +3,7 @@ package nb.domain
 import akka.pattern.ask
 import akka.util.Timeout
 import nb.Publisher
-import nb.domain.Operations.{Transaction, TransactionResponse}
+import nb.domain.Operations.{Account, Transaction, TransactionResponse}
 import nb.domain.violations.Violation.DoubledTransaction
 import nb.helper.TestHelper
 import spray.json.enrichAny
@@ -20,7 +20,7 @@ class PublisherSpec extends TestHelper{
   "Publisher actor" must {
 
     "convert OperationResponse and publish it in json format" in{
-      val res = TransactionResponse(Transaction("a", 10, "2019-02-13T11:02:20.000Z"), Set(DoubledTransaction))
+      val res = TransactionResponse(Some(Account(true, 100)), Set(DoubledTransaction))
       val publisher = system.actorOf(Publisher.props(outputMock))
       publisher ! res
       //This is async process, I could have dealt with that by response from the actor and wait for the response.
