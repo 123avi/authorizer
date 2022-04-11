@@ -65,15 +65,34 @@ class AuthorizerSpec extends TestHelper {
 
     "respond with Account-Already-Initialized rule: Init an inactive account only once" in {
       val probe = TestProbe()
-      val inactiveAccount = Account(false, 500)
+      val account = Account(false, 500)
 
       val authorizer = system.actorOf(Authorizer.props( probe.ref))
-      authorizer ! InitOperation(inactiveAccount)
-      probe.expectMsg(InitOperationResponse(inactiveAccount, Set()))
-      authorizer ! InitOperation(inactiveAccount)
-      probe.expectMsg(InitOperationResponse(inactiveAccount, Set(Violation.AccountAlreadyInitialized)))
+      authorizer ! InitOperation(account)
+      probe.expectMsg(InitOperationResponse(account, Set()))
+      authorizer ! InitOperation(account)
+      probe.expectMsg(InitOperationResponse(account, Set(Violation.AccountAlreadyInitialized)))
 
     }
+
+    "respond with Account-Already-Initialized rule: Init an inactive account only once after transaction" in {
+      val probe = TestProbe()
+      val account = Account(true, 500)
+      val transaction1 = Transaction("Burger King", 50, "2019-02-13T11:00:00.000Z")
+
+
+      val authorizer = system.actorOf(Authorizer.props( probe.ref))
+      authorizer ! InitOperation(account)
+      probe.expectMsg(InitOperationResponse(account, Set()))
+      authorizer ! TransactionOperation(transaction1)
+      probe.expectMsg(TransactionResponse(Some(account.copy(availableLimit = 450)), Set()))
+
+      authorizer ! InitOperation(account)
+      probe.expectMsg(InitOperationResponse(account, Set(Violation.AccountAlreadyInitialized)))
+
+    }
+
+
 
     "respond with AccountNotInitialized rule: No transaction should be accepted when the account is not initialized" in {
 

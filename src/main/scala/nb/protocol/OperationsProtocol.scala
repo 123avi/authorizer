@@ -25,13 +25,13 @@ object OperationsProtocol extends DefaultJsonProtocol {
 
   //{"transaction": {"merchant": "Burger King", "amount": 20, "time":"2019-02-13T10:00:00.000Z"}}
 
-  implicit val initOperationProtocol = jsonFormat1(InitOperation)
+  implicit val initOperationProtocol: RootJsonFormat[InitOperation] = jsonFormat1(InitOperation)
   implicit object ViolationFormat extends RootJsonWriter[Violation] {
     override def write(obj: Violation): JsValue = JsString(obj.asString)
   }
 
-  implicit val transactionFormat = jsonFormat3(Transaction)
-  implicit val transactionOperationFormat = jsonFormat1(TransactionOperation)
+  implicit val transactionFormat: RootJsonFormat[Transaction] = jsonFormat3(Transaction)
+  implicit val transactionOperationFormat: RootJsonFormat[TransactionOperation] = jsonFormat1(TransactionOperation)
 
   implicit object operationFormat extends RootJsonFormat[Operation] {
     override def read(json: JsValue): Operation ={
@@ -56,7 +56,7 @@ object OperationsProtocol extends DefaultJsonProtocol {
 
   implicit object TransactionResponseProtocol extends RootJsonWriter[TransactionResponse] {
     override def write(obj: TransactionResponse): JsValue = JsObject(
-      "account" -> obj.account.toJson,
+      "account" -> obj.account.map(_.toJson).getOrElse(JsObject.empty),
       "violations" -> JsArray(obj.violations.toVector.map(_.toJson))
     )
   }

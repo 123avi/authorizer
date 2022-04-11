@@ -9,7 +9,7 @@ import scala.language.postfixOps
 object Authorizer{
   import nb.utils.DateTimeConversions._
 
-  def props( replyTo: ActorRef) = Props(new Authorizer(replyTo))
+  def props( replyTo: ActorRef): Props = Props(new Authorizer(replyTo))
   def isWithinInterval(t1 : String, t2: String, interval: Long = AuthorizerConfig.transactionInterval) : Boolean = {
     t1.tryParse.flatMap(p1 => t2.tryParse.map {p2 =>
       (p1 - p2).abs <= interval}).get
@@ -64,7 +64,7 @@ class Authorizer( replyTo: ActorRef) extends Actor with ActorLogging with DateTi
     case TransactionOperation(t)  =>
       val newLimit = account.availableLimit - t.amount
       val acc = account.copy(availableLimit = newLimit)
-      context.become(run(acc, transactions + t))
+      context.become(run(acc, transactions + t).orElse(defaultViolation("run")))
       replyTo ! TransactionResponse(Some(acc), Set())
 
   }
